@@ -15,17 +15,19 @@ export default function Navbar() {
         DigitalDZ
       </Link>
       
-      <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
         <Link href={`/${locale}/products`} className="title-font" style={{ color: 'var(--foreground-muted)', textDecoration: 'none', fontWeight: 600 }}>
           {nt('products')}
         </Link>
         
         {status === 'authenticated' ? (
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-             <span style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600 }}>
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+             <span style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
                {session.user?.name || session.user?.email}
                {(session.user as any)?.role === 'ADMIN' && (
-                 <span style={{ marginLeft: '0.5rem', fontSize: '0.7rem', background: 'var(--primary)', padding: '0.2rem 0.5rem', borderRadius: '0.5rem' }}>ADMIN</span>
+                 <Link href={`/${locale}/admin`} style={{ marginInlineStart: '0.5rem', fontSize: '0.75rem', background: 'var(--primary)', padding: '0.3rem 0.6rem', borderRadius: '0.5rem', textDecoration: 'none', color: 'white', fontWeight: 'bold' }}>
+                   لوحة التحكم
+                 </Link>
                )}
              </span>
              <button 
@@ -37,12 +39,12 @@ export default function Navbar() {
              </button>
           </div>
         ) : (
-          <Link href={`/${locale}/login`} className="btn-primary" style={{ padding: '0.6rem 1.2rem', textDecoration: 'none' }}>
+          <Link href={`/${locale}/login`} className="btn-primary" style={{ padding: '0.5rem 1rem', textDecoration: 'none', fontSize: '0.9rem' }}>
             {nt('login')}
           </Link>
         )}
 
-        <div style={{ display: 'flex', gap: '0.8rem', marginLeft: '1.5rem', borderLeft: '1px solid var(--glass-border)', paddingLeft: '1.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginInlineStart: '1rem', borderInlineStart: '1px solid var(--glass-border)', paddingInlineStart: '1rem' }}>
           <Link href="/ar" style={{ color: locale === 'ar' ? 'var(--primary)' : 'var(--foreground-muted)', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 700 }}>AR</Link>
           <span style={{ color: 'var(--glass-border)' }}>|</span>
           <Link href="/fr" style={{ color: locale === 'fr' ? 'var(--primary)' : 'var(--foreground-muted)', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 700 }}>FR</Link>

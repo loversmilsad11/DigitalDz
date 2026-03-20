@@ -80,14 +80,26 @@ h1, h2, h3, h4, .title-font {
 }
 
 .nav-bar {
-  height: 80px;
+  height: auto;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   position: sticky;
   top: 0;
   z-index: 100;
   margin-bottom: 2rem;
+  padding: 1rem 2rem;
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 
 .glow {
@@ -109,4 +121,9 @@ h1, h2, h3, h4, .title-font {
 
 .fade-in {
   animation: fadeIn 0.8s forwards ease-out;
+}
+
+/* Admin Sidebar link hover */
+.admin-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
