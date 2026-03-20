@@ -28,5 +28,35 @@
     "addToCart": "Ajouter au panier",
     "search": "Rechercher...",
     "loading": "Chargement..."
+  },
+  "Product": {
+    "price": "Prix",
+    "description": "Description",
+    "buyNow": "Acheter maintenant",
+    "available": "En stock",
+    "unavailable": "Rupture de stock",
+    "relatedProducts": "Produits connexes"
+  },
+  "Cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide",
+    "total": "Total",
+    "checkout": "Payer",
+    "remove": "Supprimer"
+  },
+  "Footer": {
+    "rights": "Tous droits réservés. Algérie 2026",
+    "about": "À propos",
+    "support": "Support technique"
+  },
+  "About": {
+    "title": "À propos",
+    "description": "Votre plateforme préférée en Algérie pour tout ce qui concerne les produits numériques. Nous fournissons des clés de jeux, des logiciels et des abonnements avec la plus haute qualité et la livraison la plus rapide.",
+    "mission": "Notre mission est de faciliter l'accès au monde numérique pour tous les Algériens en toute sécurité et à des prix abordables.",
+    "values": {
+      "security": "Sécurité totale",
+      "speed": "Vitesse maximale",
+      "support": "Support permanent"
+    }
   }
 }
