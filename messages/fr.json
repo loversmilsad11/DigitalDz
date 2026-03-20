@@ -1,0 +1,32 @@
+{
+  "Index": {
+    "title": "Boutique de Produits Numériques",
+    "description": "Les meilleurs produits numériques en Algérie avec une qualité supérieure.",
+    "cta": "Parcourir les produits"
+  },
+  "Navbar": {
+    "home": "Accueil",
+    "products": "Produits",
+    "contact": "Contact",
+    "login": "Connexion",
+    "cart": "Panier"
+  },
+  "Categories": {
+    "gaming": "Jeux",
+    "software": "Logiciels",
+    "subscriptions": "Abonnements"
+  },
+  "Auth": {
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "email": "Email",
+    "password": "Mot de passe"
+  },
+  "Common": {
+    "currency": "DA",
+    "buyNow": "Acheter maintenant",
+    "addToCart": "Ajouter au panier",
+    "search": "Rechercher...",
+    "loading": "Chargement..."
+  }
+}
