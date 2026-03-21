@@ -4,13 +4,15 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { User, LogOut, LayoutDashboard, Globe } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, Globe, ShoppingCart } from 'lucide-react';
+import { useCart } from './CartContext';
 
 export default function Navbar() {
   const nt = useTranslations('Navbar');
   const { locale } = useParams();
   const { data: session, status } = useSession();
   const [scrolled, setScrolled] = useState(false);
+  const { totalItems } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,6 +48,45 @@ export default function Navbar() {
           {nt('products')}
         </Link>
         
+        {/* Cart Icon */}
+        <Link 
+          href={`/${locale}/cart`} 
+          style={{ 
+            position: 'relative', 
+            color: 'white', 
+            textDecoration: 'none', 
+            display: 'flex', 
+            alignItems: 'center',
+            opacity: 0.8,
+            transition: 'opacity 0.2s'
+          }}
+          onMouseOver={e => (e.currentTarget as HTMLElement).style.opacity = '1'}
+          onMouseOut={e => (e.currentTarget as HTMLElement).style.opacity = '0.8'}
+          title={nt('cart')}
+        >
+          <ShoppingCart size={22} />
+          {totalItems > 0 && (
+            <span style={{
+              position: 'absolute',
+              top: '-8px',
+              insetInlineEnd: '-8px',
+              backgroundColor: '#e879f9',
+              color: 'white',
+              borderRadius: '50%',
+              width: '18px',
+              height: '18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.65rem',
+              fontWeight: 900,
+              border: '2px solid #0a0a0a'
+            }}>
+              {totalItems > 9 ? '9+' : totalItems}
+            </span>
+          )}
+        </Link>
+
         {status === 'authenticated' ? (
           <div style={{ display: 'flex', gap: scrolled ? '0.8rem' : '1.2rem', alignItems: 'center', transition: 'gap 0.4s' }}>
              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'rgba(255,255,255,0.05)', padding: '0.4rem 1rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -59,6 +100,15 @@ export default function Navbar() {
                  </Link>
                )}
              </div>
+             <Link
+               href={`/${locale}/profile`}
+               style={{ background: 'transparent', color: 'var(--foreground-muted)', display: 'flex', alignItems: 'center', padding: '0.5rem', textDecoration: 'none', transition: 'color 0.2s' }}
+               title="ملفي الشخصي"
+               onMouseOver={e => (e.currentTarget as HTMLElement).style.color = 'white'}
+               onMouseOut={e => (e.currentTarget as HTMLElement).style.color = 'var(--foreground-muted)'}
+             >
+               <User size={20} />
+             </Link>
              <button 
                onClick={() => signOut()}
                style={{ background: 'transparent', border: 'none', color: '#f43f5e', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0.5rem' }}

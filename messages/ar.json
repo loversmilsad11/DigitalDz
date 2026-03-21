@@ -42,7 +42,38 @@
     "empty": "سلة التسوق فارغة",
     "total": "المجموع الإجمالي",
     "checkout": "إتمام الشراء",
-    "remove": "حذف"
+    "remove": "حذف",
+    "continueShopping": "مواصلة التسوق",
+    "clearCart": "إفراغ السلة",
+    "orderSummary": "ملخص الطلب"
+  },
+  "Checkout": {
+    "title": "إتمام الشراء",
+    "contactInfo": "معلومات الاتصال",
+    "fullName": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "paymentMethod": "طريقة الدفع",
+    "confirmOrder": "تأكيد الطلب",
+    "successTitle": "تم الطلب بنجاح!",
+    "successDesc": "شكراً لشرائك! سيتم إرسال المفاتيح خلال دقائق."
+  },
+  "Profile": {
+    "title": "ملفي الشخصي",
+    "accountInfo": "معلومات الحساب",
+    "services": "الخدمات",
+    "logout": "تسجيل الخروج",
+    "orders": "الطلبات",
+    "points": "النقاط",
+    "products": "المنتجات"
+  },
+  "Orders": {
+    "title": "طلباتي",
+    "empty": "لا توجد طلبات بعد",
+    "status_PAID": "مدفوع",
+    "status_PENDING": "قيد الانتظار",
+    "status_CANCELLED": "ملغي",
+    "downloadKeys": "تحميل المفاتيح",
+    "total": "الإجمالي"
   },
   "Footer": {
     "rights": "جميع الحقوق محفوظة. الجزائر 2026",

@@ -199,3 +199,20 @@ h1, h2, h3, h4, .title-font {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
+
+/* Product Detail Responsive Grid */
+@media (max-width: 768px) {
+  [style*="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Checkout 2-col grid responsive */
+@media (max-width: 900px) {
+  [style*="grid-template-columns: 1fr min(420px"] {
+    grid-template-columns: 1fr !important;
+  }
+  [style*="grid-template-columns: 1fr min(380px"] {
+    grid-template-columns: 1fr !important;
+  }
+}

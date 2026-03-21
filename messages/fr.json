@@ -42,7 +42,38 @@
     "empty": "Votre panier est vide",
     "total": "Total",
     "checkout": "Payer",
-    "remove": "Supprimer"
+    "remove": "Supprimer",
+    "continueShopping": "Continuer les achats",
+    "clearCart": "Vider le panier",
+    "orderSummary": "Récapitulatif"
+  },
+  "Checkout": {
+    "title": "Finaliser la commande",
+    "contactInfo": "Informations de contact",
+    "fullName": "Nom complet",
+    "phone": "Numéro de téléphone",
+    "paymentMethod": "Méthode de paiement",
+    "confirmOrder": "Confirmer la commande",
+    "successTitle": "Commande réussie!",
+    "successDesc": "Merci pour votre achat! Les clés vous seront envoyées dans quelques minutes."
+  },
+  "Profile": {
+    "title": "Mon Profil",
+    "accountInfo": "Informations du compte",
+    "services": "Services",
+    "logout": "Se déconnecter",
+    "orders": "Commandes",
+    "points": "Points",
+    "products": "Produits"
+  },
+  "Orders": {
+    "title": "Mes Commandes",
+    "empty": "Pas encore de commandes",
+    "status_PAID": "Payé",
+    "status_PENDING": "En attente",
+    "status_CANCELLED": "Annulé",
+    "downloadKeys": "Télécharger les clés",
+    "total": "Total"
   },
   "Footer": {
     "rights": "Tous droits réservés. Algérie 2026",

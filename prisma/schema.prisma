@@ -92,21 +92,46 @@ model DigitalKey {
 }
 
 model Order {
-  id        String       @id @default(cuid())
-  userId    String
-  user      User         @relation(fields: [userId], references: [id])
-  total     Decimal      @db.Decimal(10, 2)
-  status    String       @default("PENDING") // PENDING, PAID, CANCELLED
-  createdAt DateTime     @default(now())
-  keys      DigitalKey[]
-  items     OrderItem[]
+  id                 String       @id @default(cuid())
+  userId             String
+  user               User         @relation(fields: [userId], references: [id])
+  total              Decimal      @db.Decimal(10, 2)
+  status             String       @default("PENDING") // PENDING, PAID, CANCELLED
+  paymentMethod      String?      // slickpay, baridimob, ccp, edahabia, cib
+  paymentId          String?      // SlickPay payment reference
+  slickpayInvoiceId  String?      // SlickPay invoice ID
+  slickpayInvoiceUrl String?      // SlickPay payment URL for SATIM
+  customerName       String?
+  customerPhone      String?
+  customerEmail      String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  keys               DigitalKey[]
+  items              OrderItem[]
+  payment            Payment?
 }
 
 model OrderItem {
   id        String  @id @default(cuid())
   orderId   String
   productId String
+  quantity  Int     @default(1)
   price     Decimal @db.Decimal(10, 2)
   order     Order   @relation(fields: [orderId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  orderId        String   @unique
+  order          Order    @relation(fields: [orderId], references: [id])
+  provider       String   @default("slickpay")
+  invoiceId      String?  // SlickPay invoice ID
+  invoiceNum     String?  // SlickPay invoice num (PAY-xxx)
+  amount         Decimal  @db.Decimal(10, 2)
+  status         String   @default("PENDING") // PENDING, PAID, FAILED, CANCELLED
+  paymentUrl     String?  @db.Text
+  callbackData   String?  @db.Text // JSON string of callback response
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

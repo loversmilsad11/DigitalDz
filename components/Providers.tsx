@@ -1,6 +1,7 @@
 'use client';
 import { SessionProvider } from "next-auth/react";
 import { NextIntlClientProvider } from 'next-intl';
+import { CartProvider } from './CartContext';
 
 export default function Providers({ 
   children, 
@@ -14,7 +15,9 @@ export default function Providers({
   return (
     <SessionProvider>
       <NextIntlClientProvider messages={messages} locale={locale}>
-        {children}
+        <CartProvider>
+          {children}
+        </CartProvider>
       </NextIntlClientProvider>
     </SessionProvider>
   );
