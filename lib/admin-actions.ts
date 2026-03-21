@@ -42,6 +42,28 @@ export async function createCategory(formData: FormData) {
   }
 }
 
+export async function updateCategory(id: string, formData: FormData) {
+  await checkAdmin();
+  
+  const nameAr = formData.get('nameAr') as string;
+  const nameFr = formData.get('nameFr') as string;
+  const slug = formData.get('slug') as string;
+
+  if (!nameAr || !nameFr || !slug) return { error: 'Missing fields' };
+
+  try {
+    const category = await prisma.category.update({
+      where: { id },
+      data: { nameAr, nameFr, slug }
+    });
+    revalidatePath('/[locale]/admin/categories', 'page');
+    return { success: true, category };
+  } catch (error: any) {
+    if (error.code === 'P2002') return { error: 'Slug already exists' };
+    return { error: 'Failed to update category' };
+  }
+}
+
 export async function deleteCategory(id: string) {
   await checkAdmin();
   try {

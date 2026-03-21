@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import Navbar from '@/components/Navbar';
 import ProductCard from '@/components/ProductCard';
+import prisma from '@/lib/db';
 
 export default async function ProductsPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
@@ -8,14 +9,11 @@ export default async function ProductsPage(props: { params: Promise<{ locale: st
   const ct = await getTranslations('Common');
   const catT = await getTranslations('Categories');
 
-  const allProducts = [
-    { id: '1', nameAr: 'بطاقة ستيم 10 دولار', nameFr: 'Carte Steam 10$', price: 2500, slug: 'steam-10', category: 'gaming' },
-    { id: '2', nameAr: 'نتفليكس شهر بريميوم', nameFr: 'Netflix 1 Mois Premium', price: 1200, slug: 'netflix-1', category: 'subscriptions' },
-    { id: '3', nameAr: 'بلايستيشن بلس سنة', nameFr: 'PS Plus 12 Mois', price: 9500, slug: 'ps-plus', category: 'gaming' },
-    { id: '4', nameAr: 'فري فاير 100 جوهرة', nameFr: 'Free Fire 100 Diamants', price: 350, slug: 'ff-100', category: 'gaming' },
-    { id: '5', nameAr: 'ويندوز 11 برو أصلي', nameFr: 'Windows 11 Pro Original', price: 4500, slug: 'win-11', category: 'software' },
-    { id: '6', nameAr: 'أدوبي كريتيف كلاود', nameFr: 'Adobe Creative Cloud', price: 15000, slug: 'adobe-cc', category: 'software' },
-  ];
+  // Fetch all products from the database
+  const products = await prisma.product.findMany({
+    orderBy: { nameAr: 'asc' },
+    include: { category: true }
+  });
 
   return (
     <div className="fade-in">
@@ -36,21 +34,27 @@ export default async function ProductsPage(props: { params: Promise<{ locale: st
            <button className="glass-morphism" style={{ padding: '0.6rem 1.5rem', borderRadius: '1rem', color: '#fff' }}>{catT('subscriptions')}</button>
         </div>
 
-        {/* Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-          {allProducts.map((p) => (
-            <ProductCard 
-              key={p.id}
-              id={p.id}
-              name={params.locale === 'ar' ? p.nameAr : p.nameFr}
-              description="تسليم فوري ومضمون لكافة ولايات الوطن."
-              price={p.price}
-              slug={p.slug}
-              currency={ct('currency')}
-              addToCartLabel={ct('addToCart')}
-            />
-          ))}
-        </div>
+        {products.length === 0 ? (
+          <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground-muted)', background: 'rgba(255,255,255,0.02)', borderRadius: '2rem', border: '1px dashed rgba(255,255,255,0.1)' }}>
+            لا توجد منتجات متوفرة حالياً.
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+            {products.map((p) => (
+              <ProductCard 
+                key={p.id}
+                id={p.id}
+                name={params.locale === 'ar' ? p.nameAr : p.nameFr}
+                description={params.locale === 'ar' ? p.descriptionAr : p.descriptionFr}
+                price={Number(p.price)}
+                slug={p.slug}
+                image={p.image || undefined}
+                currency={ct('currency')}
+                addToCartLabel={ct('addToCart')}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

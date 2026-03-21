@@ -30,7 +30,12 @@ export default async function LocaleLayout(props: {
 
   return (
     <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'}>
-      <body className={`${inter.variable} ${outfit.variable}`}>
+      <body className={`${inter.variable} ${outfit.variable}`} style={{ position: 'relative' }}>
+        {/* Cosmic Background Blobs */}
+        <div className="bg-blob blob-1" />
+        <div className="bg-blob blob-2" />
+        <div className="bg-blob blob-3" />
+
         <Providers messages={messages} locale={locale}>
           <div className="min-h-screen bg-surface text-foreground font-inter">
             {props.children}
