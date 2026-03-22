@@ -94,8 +94,6 @@ model Order {
   status             String       @default("PENDING")
   paymentMethod      String?
   paymentId          String?
-  slickpayInvoiceId  String?
-  slickpayInvoiceUrl String?
   customerName       String?
   customerPhone      String?
   customerEmail      String?
@@ -120,9 +118,8 @@ model OrderItem {
 model Payment {
   id           String   @id @default(cuid())
   orderId      String   @unique
-  provider     String   @default("slickpay")
+  provider     String?
   invoiceId    String?
-  invoiceNum   String?
   amount       Decimal  @db.Decimal(10, 2)
   status       String   @default("PENDING")
   paymentUrl   String?

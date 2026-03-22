@@ -1,15 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { User, LogOut, LayoutDashboard, Globe, ShoppingCart } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, ShoppingCart } from 'lucide-react';
 import { useCart } from './CartContext';
 
 export default function Navbar() {
-  const nt = useTranslations('Navbar');
-  const { locale } = useParams();
   const { data: session, status } = useSession();
   const [scrolled, setScrolled] = useState(false);
   const { totalItems } = useCart();
@@ -39,18 +35,24 @@ export default function Navbar() {
         boxShadow: scrolled ? '0 10px 30px rgba(0,0,0,0.5)' : 'none'
       }}
     >
-      <Link href={`/${locale}`} className="gradient-text title-font" style={{ fontSize: scrolled ? '1.3rem' : '1.6rem', fontWeight: 900, textDecoration: 'none', transition: 'font-size 0.4s' }}>
+      <Link href="/" className="gradient-text title-font" style={{ fontSize: scrolled ? '1.3rem' : '1.6rem', fontWeight: 900, textDecoration: 'none', transition: 'font-size 0.4s' }}>
         DigitalDZ
       </Link>
       
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-        <Link href={`/${locale}/products`} className="title-font" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
-          {nt('products')}
+        <Link href="/products" className="title-font" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
+          المنتجات
+        </Link>
+        <Link href="/about" className="title-font" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
+          من نحن
+        </Link>
+        <Link href="/contact" className="title-font" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
+          اتصل بنا
         </Link>
         
         {/* Cart Icon */}
         <Link 
-          href={`/${locale}/cart`} 
+          href="/cart" 
           style={{ 
             position: 'relative', 
             color: 'white', 
@@ -62,7 +64,7 @@ export default function Navbar() {
           }}
           onMouseOver={e => (e.currentTarget as HTMLElement).style.opacity = '1'}
           onMouseOut={e => (e.currentTarget as HTMLElement).style.opacity = '0.8'}
-          title={nt('cart')}
+          title="سلة التسوق"
         >
           <ShoppingCart size={22} />
           {totalItems > 0 && (
@@ -95,13 +97,13 @@ export default function Navbar() {
                  {session.user?.name?.split(' ')[0] || session.user?.email?.split('@')[0]}
                </span>
                {(session.user as any)?.role === 'ADMIN' && (
-                 <Link href={`/${locale}/admin`} title="لوحة التحكم" style={{ display: 'flex', alignItems: 'center', color: '#e879f9', textDecoration: 'none' }}>
+                 <Link href="/admin" title="لوحة التحكم" style={{ display: 'flex', alignItems: 'center', color: '#e879f9', textDecoration: 'none' }}>
                    <LayoutDashboard size={18} style={{ marginInlineStart: '0.5rem' }} />
                  </Link>
                )}
              </div>
              <Link
-               href={`/${locale}/profile`}
+               href="/profile"
                style={{ background: 'transparent', color: 'var(--foreground-muted)', display: 'flex', alignItems: 'center', padding: '0.5rem', textDecoration: 'none', transition: 'color 0.2s' }}
                title="ملفي الشخصي"
                onMouseOver={e => (e.currentTarget as HTMLElement).style.color = 'white'}
@@ -118,19 +120,12 @@ export default function Navbar() {
              </button>
           </div>
         ) : (
-          <Link href={`/${locale}/login`} className="btn-primary" style={{ padding: scrolled ? '0.4rem 1.2rem' : '0.6rem 1.5rem', textDecoration: 'none', fontSize: '0.85rem', borderRadius: '1rem', transition: 'all 0.4s' }}>
-            {nt('login')}
+          <Link href="/login" className="btn-primary" style={{ padding: scrolled ? '0.4rem 1.2rem' : '0.6rem 1.5rem', textDecoration: 'none', fontSize: '0.85rem', borderRadius: '1rem', transition: 'all 0.4s' }}>
+            تسجيل الدخول
           </Link>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginInlineStart: '0.5rem', borderInlineStart: '1px solid rgba(255,255,255,0.1)', paddingInlineStart: '1.2rem' }}>
-          <Globe size={16} style={{ color: 'var(--foreground-muted)' }} />
-          <div style={{ display: 'flex', gap: '0.4rem' }}>
-            <Link href="/ar" style={{ color: locale === 'ar' ? '#e879f9' : 'var(--foreground-muted)', fontSize: '0.8rem', textDecoration: 'none', fontWeight: 800 }}>AR</Link>
-            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem' }}>|</span>
-            <Link href="/fr" style={{ color: locale === 'fr' ? '#e879f9' : 'var(--foreground-muted)', fontSize: '0.8rem', textDecoration: 'none', fontWeight: 800 }}>FR</Link>
-          </div>
-        </div>
+        {/* Language switcher removed as requested to keep only Arabic */}
       </div>
     </nav>
   );

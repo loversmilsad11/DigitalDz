@@ -1,24 +1,17 @@
 'use client';
 import { SessionProvider } from "next-auth/react";
-import { NextIntlClientProvider } from 'next-intl';
 import { CartProvider } from './CartContext';
 
 export default function Providers({ 
-  children, 
-  messages, 
-  locale 
+  children 
 }: { 
   children: React.ReactNode; 
-  messages: any;
-  locale: string;
 }) {
   return (
     <SessionProvider>
-      <NextIntlClientProvider messages={messages} locale={locale} timeZone="Africa/Algiers">
-        <CartProvider>
-          {children}
-        </CartProvider>
-      </NextIntlClientProvider>
+      <CartProvider>
+        {children}
+      </CartProvider>
     </SessionProvider>
   );
 }

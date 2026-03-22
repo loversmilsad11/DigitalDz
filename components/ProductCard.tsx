@@ -1,10 +1,8 @@
 'use client';
-import { useFormatter } from 'next-intl';
 import Link from 'next/link';
 import { ShoppingCart, Zap, Check } from 'lucide-react';
 import { useCart } from './CartContext';
 import { useState } from 'react';
-import { useParams } from 'next/navigation';
 
 interface ProductCardProps {
   id: string;
@@ -18,9 +16,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ id, name, description, price, slug, currency, addToCartLabel, image }: ProductCardProps) {
-  const format = useFormatter();
   const { addItem } = useCart();
-  const { locale } = useParams();
   const [added, setAdded] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -32,7 +28,7 @@ export default function ProductCard({ id, name, description, price, slug, curren
 
   return (
     <Link 
-      href={`/${locale}/products/${slug}`}
+      href={`/products/${slug}`}
       style={{ textDecoration: 'none', display: 'block', height: '100%' }}
     >
       <div 
@@ -151,7 +147,7 @@ export default function ProductCard({ id, name, description, price, slug, curren
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.7rem', color: 'var(--foreground-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>السعر</span>
               <span className="title-font" style={{ fontWeight: 900, fontSize: '1.25rem', color: 'white' }}>
-                {format.number(price)} <span style={{ fontSize: '0.8rem', fontWeight: 500, color: '#e879f9' }}>{currency}</span>
+                {new Intl.NumberFormat('en-DZ').format(price)} <span style={{ fontSize: '0.8rem', fontWeight: 500, color: '#e879f9' }}>{currency}</span>
               </span>
             </div>
             <button 
