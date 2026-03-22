@@ -72,6 +72,9 @@ export async function POST(req: NextRequest) {
     // 6) Create SlickPay invoice
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const callbackUrl = `${appUrl}/api/slickpay/callback?orderId=${order.id}`;
+    const cancelUrl = `${appUrl}/checkout`;
+
+    console.log('[SlickPay] Preparing to call SlickPay for order:', order.id);
 
     const invoiceItems = items.map((item: { name: string; price: number; quantity: number }) => ({
       name: item.name,
@@ -82,8 +85,11 @@ export async function POST(req: NextRequest) {
     const invoiceResponse = await createInvoice({
       amount: totalAmount,
       url: callbackUrl,
+      cancel_url: cancelUrl,
       items: invoiceItems,
     });
+
+    console.log('[SlickPay] Invoice created successfully:', invoiceResponse.id);
 
     // 7) Update order with SlickPay data
     await (prisma as any).order.update({
@@ -116,21 +122,36 @@ export async function POST(req: NextRequest) {
       message: 'تم إنشاء الفاتورة بنجاح / Facture créée avec succès',
     });
 
-  } catch (error) {
-    console.error('[SlickPay] Create invoice error:', error);
+  } catch (error: any) {
+    console.error('[SlickPay] Fatal Route Error:', error);
 
     if (error instanceof SlickPayError) {
+      console.error('[SlickPay] API Details:', {
+        status: error.statusCode,
+        errors: error.errors,
+        raw: error.rawResponse
+      });
+
       return NextResponse.json(
         { 
           error: `خطأ في بوابة الدفع: ${error.message}`,
-          details: error.errors 
+          details: error.errors,
+          code: error.statusCode
         },
-        { status: error.statusCode }
+        { status: 500 } // Keep 500 for internal tracking but provide details
+      );
+    }
+
+    // Prisma error handling
+    if (error.code === 'P2003') {
+      return NextResponse.json(
+        { error: 'خطأ في قاعدة البيانات: المستخدم غير موجود. يرجى تسجيل الخروج ثم الدخول مرة أخرى. / Erreur BD: Utilisateur inexistant. Veuillez vous reconnecter.' },
+        { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { error: 'حدث خطأ غير متوقع / Une erreur inattendue s\'est produite' },
+      { error: error.message || 'حدث خطأ غير متوقع / Une erreur inattendue s\'est produite' },
       { status: 500 }
     );
   }

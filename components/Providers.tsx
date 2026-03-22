@@ -14,7 +14,7 @@ export default function Providers({
 }) {
   return (
     <SessionProvider>
-      <NextIntlClientProvider messages={messages} locale={locale}>
+      <NextIntlClientProvider messages={messages} locale={locale} timeZone="Africa/Algiers">
         <CartProvider>
           {children}
         </CartProvider>

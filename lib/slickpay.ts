@@ -1,22 +1,28 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 /**
  * SlickPay API Wrapper for Quick Integration
  * Implementation based on: https://developers.slick-pay.com/quick-integration
  */
 
+// Configuration
 const API_URL = process.env.SLICKPAY_API_URL || 'https://devapi.slick-pay.com/api/v2';
-const PUBLIC_KEY = process.env.SLICKPAY_PUBLIC_KEY || '';
+// For server-side calls, SlickPay usually expects the "API Key" which starts with numbers (e.g. 41155|...)
+// Use SLICKPAY_PUBLIC_KEY as the primary bearer token if SLICKPAY_SECRET_KEY is just for signing.
+// However, many users use SLICKPAY_SECRET_KEY as the bearer token. Let's provide a way to use both.
+const API_TOKEN = process.env.SLICKPAY_PUBLIC_KEY || '';
 
 export class SlickPayError extends Error {
   statusCode: number;
   errors?: any;
+  rawResponse?: any;
 
-  constructor(message: string, statusCode: number, errors?: any) {
+  constructor(message: string, statusCode: number, errors?: any, rawResponse?: any) {
     super(message);
     this.name = 'SlickPayError';
     this.statusCode = statusCode;
     this.errors = errors;
+    this.rawResponse = rawResponse;
   }
 }
 
@@ -24,63 +30,91 @@ export class SlickPayError extends Error {
  * Check if SlickPay is configured
  */
 export const isSlickPayConfigured = () => {
-  return !!PUBLIC_KEY && PUBLIC_KEY !== 'YOUR_KEY_HERE';
+  return !!API_TOKEN && API_TOKEN !== 'YOUR_KEY_HERE';
 };
 
 /**
- * Create a SlickPay Invoice (SATIM Payment)
- * @param amount Total amount in DZD
- * @param url Redirect URL after payment completion
- * @param items List of products { name, price, quantity }
+ * Create a SlickPay Invoice (SATIM / CIB / Edahabia Payment)
  */
 export async function createInvoice({
   amount,
   url,
   items,
+  cancel_url,
 }: {
   amount: number;
-  url: string;
+  url: string; // success_url
   items: Array<{ name: string; price: number; quantity: number }>;
+  cancel_url?: string;
 }) {
   try {
+    const SECRET_KEY = (process.env.SLICKPAY_SECRET_KEY || '').trim();
+    const API_URL = process.env.SLICKPAY_API_URL || 'https://devapi.slick-pay.com/api/v2';
+    
+    console.log('[SlickPay] Attempting to create invoice (New Format):', { amount });
+
+    // 1) Prepare Payload according to user request
+    const payload = {
+      amount: Math.round(amount),
+      currency: "DZD",
+      success_url: url,
+      cancel_url: cancel_url || url, // Default to success URL if not provided
+      items: items.map(item => ({
+        name: item.name,
+        unit_price: Math.round(item.price),
+        quantity: item.quantity || 1,
+      })),
+    };
+
+    console.log('[SlickPay] Payload:', JSON.stringify(payload, null, 2));
+
+    // 2) Execution - Using /invoices endpoint
     const response = await axios.post(
-      `${API_URL}/users/invoices`,
-      {
-        amount,
-        url,
-        items,
-        // Optional: contact can be added if you have a contact ID from SlickPay contacts API
-      },
+      `${API_URL}/invoices`, 
+      payload,
       {
         headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${PUBLIC_KEY}`,
+          'Content-Type': 'application/json',
+          'Authorization': SECRET_KEY,
         },
+        timeout: 10000,
       }
     );
 
-    // According to Quick Integration guide, data is in response.data.data or result.data
-    // If using axios, result.data is the body, and typically SlickPay returns { success, data: { url, ... } }
     const result = response.data;
-    
+    console.log('[SlickPay] Response Success:', result);
+
     if (result.success === false) {
-      throw new SlickPayError(result.msg || 'Failed to create invoice', 400, result.errors);
+      throw new SlickPayError(result.msg || 'SlickPay reported failure', 400, result.errors, result);
     }
 
+    // Adapt response to our expected format
     return {
-      id: result.data.id,
-      url: result.data.url, // This is the SATIM payment URL
-      invoice_id: result.data.invoice_id,
+      id: result.data?.id || result.id,
+      url: result.data?.url || result.url,
+      invoice_id: result.data?.invoice_id || result.invoice_id,
+      raw: result.data || result
     };
+
   } catch (error: any) {
-    if (error.response) {
-      throw new SlickPayError(
-        error.response.data?.msg || 'SlickPay API Error',
-        error.response.status,
-        error.response.data?.errors
-      );
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<any>;
+      console.error('[SlickPay] Axios Error Context:', {
+        status: axiosError.response?.status,
+        data: axiosError.response?.data,
+        headers: axiosError.response?.headers,
+        message: axiosError.message
+      });
+
+      const message = axiosError.response?.data?.msg || axiosError.response?.data?.message || axiosError.message;
+      const status = axiosError.response?.status || 500;
+      const errors = axiosError.response?.data?.errors;
+
+      throw new SlickPayError(`SlickPay: ${message}`, status, errors, axiosError.response?.data);
     }
-    throw error;
+
+    console.error('[SlickPay] Unexpected Error:', error);
+    throw new SlickPayError(error.message || 'Unexpected communication error', 500);
   }
 }
 
@@ -90,53 +124,45 @@ export async function createInvoice({
  */
 export async function checkPaymentStatus(invoiceId: string | number) {
   try {
+    console.log(`[SlickPay] Checking status for invoice: ${invoiceId}`);
+    
     const response = await axios.get(`${API_URL}/users/invoices/${invoiceId}`, {
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${PUBLIC_KEY}`,
+        'Content-Type': 'application/json',
+        'x-api-key': (process.env.SLICKPAY_SECRET_KEY || '').trim(),
       },
     });
 
     const result = response.data;
+    const data = result.data;
     
-    // Quick Integration Guide says paymentStatus is in response.data.data.payment_status
-    // Values: 'paid' or 'unpaid'
-    const paymentStatus = result.data.payment_status;
+    // payment_status: 'paid' or 'unpaid'
+    const status = (data.payment_status || '').toLowerCase();
     
     return {
-      isPaid: paymentStatus === 'paid',
-      status: paymentStatus,
-      amount: result.data.amount,
-      invoiceNum: result.data.invoice_id
+      isPaid: status === 'paid',
+      status: status,
+      amount: data.amount,
+      invoiceNum: data.invoice_id,
+      updatedAt: data.updated_at,
+      raw: data
     };
   } catch (error: any) {
-    console.error('[SlickPay] Status check error:', error.message);
+    if (axios.isAxiosError(error)) {
+      console.error('[SlickPay] Status check failed:', error.response?.data || error.message);
+    } else {
+      console.error('[SlickPay] Unexpected status check error:', error);
+    }
     return { isPaid: false, status: 'error' };
   }
 }
 
 /**
- * Calculate the commission (Optional helper)
+ * Generate the Iframe URL for embedded payments
  */
-export async function calculateCommission(amount: number) {
-  try {
-    const response = await axios.get(`${API_URL}/users/commission?amount=${amount}`, {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${PUBLIC_KEY}`,
-      },
-    });
-    return response.data.data;
-  } catch (error) {
-    return null;
-  }
+export function getIframeUrl(invoiceId: number, locale: string = 'ar') {
+  const isSandbox = process.env.SLICKPAY_SANDBOX === 'true';
+  const domain = isSandbox ? 'https://devapi.slick-pay.com' : 'https://api.slick-pay.com';
+  return `${domain}/payment-iframe/${invoiceId}?locale=${locale}`;
 }
 
-/**
- * Get iFrame URL if needed for QR code payments
- */
-export function getIframeUrl(invoiceId: number, locale: string = 'fr') {
-  const isSandbox = process.env.SLICKPAY_SANDBOX === 'true';
-  const baseUrl = isSandbox ? 'https://devapi.slick-pay.com' : 'https://api.slick-pay.com';
-  return `${baseUrl}/payment-iframe/${invoiceId}?locale=${locale}`;
-}
