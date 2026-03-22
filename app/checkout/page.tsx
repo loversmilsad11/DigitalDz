@@ -19,6 +19,7 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   const [selectedPayment, setSelectedPayment] = useState('baridimob');
+  const [transactionId, setTransactionId] = useState('');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState(session?.user?.name || '');
   const [email, setEmail] = useState(session?.user?.email || '');
@@ -32,16 +33,33 @@ export default function CheckoutPage() {
   }, [session]);
 
   const handleManualPayment = async () => {
+    if (!transactionId) {
+      setError('يرجى إدخال رقم المعاملة أو رقم الوصل');
+      return;
+    }
+    
     setLoading(true);
     setError('');
 
     try {
-      await new Promise(r => setTimeout(r, 2000));
-      setLoading(false);
+      const response = await fetch('/api/checkout/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(item => ({ productId: item.id, quantity: item.quantity, price: item.price })),
+          paymentMethod: selectedPayment,
+          paymentId: transactionId,
+          name, phone, email
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'فشل إنشاء الطلب');
+
       setSuccess(true);
       clearCart();
-    } catch {
-      setError('حدث خطأ');
+    } catch (err: any) {
+      setError(err.message || 'حدث خطأ أثناء الاتصال بالخادم');
       setLoading(false);
     }
   };
@@ -125,6 +143,10 @@ export default function CheckoutPage() {
                          </div>
                       </button>
                     ))}
+                 </div>
+                 <div style={{ marginTop: '1.5rem' }}>
+                   <p style={{ fontSize: '0.9rem', color: 'var(--foreground-muted)', marginBottom: '0.75rem' }}>الرجاء إدخال رقم المعاملة أو رقم الوصل لتأكيد الدفع الخاص بك:</p>
+                   <input type="text" value={transactionId} onChange={e => setTransactionId(e.target.value)} placeholder="رقم المعاملة (Transaction ID / N° de CCP)" style={{ ...inputStyle, direction: 'ltr' }} />
                  </div>
               </div>
             </div>

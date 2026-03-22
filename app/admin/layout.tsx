@@ -18,16 +18,16 @@ export default async function AdminLayout({
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>
       {/* Sidebar */}
-      <aside className="glass-morphism" style={{ 
-        width: '260px', 
-        borderInlineEnd: '1px solid var(--glass-border)', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        padding: '1.5rem', 
-        position: 'sticky', 
-        top: 0, 
-        height: '100vh', 
-        overflowY: 'auto' 
+      <aside className="glass-morphism" style={{
+        width: '260px',
+        borderInlineEnd: '1px solid var(--glass-border)',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '1.5rem',
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        overflowY: 'auto'
       }}>
         <div style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
           <Link href="/admin" className="title-font gradient-text" style={{ fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none' }}>
@@ -41,6 +41,10 @@ export default async function AdminLayout({
             <LayoutDashboard size={20} style={{ color: 'var(--primary)' }} />
             <span style={{ fontWeight: 500 }}>نظرة عامة</span>
           </Link>
+          <Link href="/admin/orders" className="admin-nav-link" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '0.75rem', textDecoration: 'none', color: 'white', transition: 'background 0.2s' }}>
+            <Package size={20} style={{ color: '#fbbf24' }} />
+            <span style={{ fontWeight: 500 }}>الطلبات والمراجعة</span>
+          </Link>
           <Link href="/admin/categories" className="admin-nav-link" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '0.75rem', textDecoration: 'none', color: 'white', transition: 'background 0.2s' }}>
             <Tag size={20} style={{ color: '#34d399' }} />
             <span style={{ fontWeight: 500 }}>الفئات</span>
@@ -49,10 +53,6 @@ export default async function AdminLayout({
             <Package size={20} style={{ color: '#e879f9' }} />
             <span style={{ fontWeight: 500 }}>المنتجات</span>
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '0.75rem', textDecoration: 'none', color: 'white', opacity: 0.5, cursor: 'not-allowed' }}>
-            <Code size={20} style={{ color: '#fbbf24' }} />
-            <span style={{ fontWeight: 500 }}>المفاتيح</span>
-          </div>
         </nav>
 
         <div style={{ marginTop: 'auto', borderTop: '1px solid var(--glass-border)', paddingTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
