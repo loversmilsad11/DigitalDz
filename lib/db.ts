@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
+// Prisma client initialization with support for new models (Review, Coupon, etc.)
 const prismaClientSingleton = () => {
   return new PrismaClient()
 }

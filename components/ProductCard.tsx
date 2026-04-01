@@ -73,6 +73,7 @@ export default function ProductCard({ id, name, description, price, slug, curren
             <img 
               src={image} 
               alt={name} 
+              loading="lazy"
               style={{ 
                 width: '100%', 
                 height: '100%', 

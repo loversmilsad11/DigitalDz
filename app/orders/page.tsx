@@ -5,13 +5,14 @@ import { useEffect, useState, type ReactNode } from 'react';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/Animations';
-import { Package, ShoppingBag, Clock, CheckCircle2, XCircle, Zap } from 'lucide-react';
+import { Package, ShoppingBag, Clock, CheckCircle2, XCircle, Zap, ExternalLink } from 'lucide-react';
 
 // Status config
 const STATUS_CONFIG: Record<string, { labelAr: string; color: string; icon: ReactNode }> = {
-  PAID: { labelAr: 'مدفوع', color: '#22c55e', icon: <CheckCircle2 size={15} /> },
-  PENDING: { labelAr: 'قيد الانتظار', color: '#f59e0b', icon: <Clock size={15} /> },
-  CANCELLED: { labelAr: 'ملغي', color: '#f43f5e', icon: <XCircle size={15} /> },
+  PAID:      { labelAr: 'مدفوع',        color: '#22c55e', icon: <CheckCircle2 size={15} /> },
+  COMPLETED: { labelAr: 'مكتمل',        color: '#22c55e', icon: <CheckCircle2 size={15} /> },
+  PENDING:   { labelAr: 'قيد الانتظار', color: '#f59e0b', icon: <Clock size={15} /> },
+  CANCELLED: { labelAr: 'ملغي',         color: '#f43f5e', icon: <XCircle  size={15} /> },
 };
 
 function OrderCard({ order }: { order: any }) {
@@ -90,24 +91,21 @@ function OrderCard({ order }: { order: any }) {
             {Number(order.total).toLocaleString()} <span style={{ fontSize: '0.85rem', color: '#e879f9', fontWeight: 600 }}>د.ج</span>
           </div>
         </div>
-        {order.status === 'PAID' && (
-          <button
-            className="btn-primary"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.6rem 1.2rem',
-              borderRadius: '1rem',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-            }}
-          >
-            <Zap size={15} fill="currentColor" />
-            تحميل المفاتيح
-          </button>
-        )}
+        <Link href={`/orders/${order.id}`} style={{
+          display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+          padding: '0.6rem 1.2rem', borderRadius: '1rem', fontWeight: 700,
+          fontSize: '0.85rem', textDecoration: 'none', color: 'white',
+          background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)',
+          transition: 'all 0.2s',
+        }}>
+          <ExternalLink size={15} />
+          عرض التفاصيل
+          {(order.status === 'COMPLETED' || order.status === 'PAID') && order.keys?.length > 0 && (
+            <span style={{ background: '#fbbf24', color: '#000', borderRadius: '1rem', padding: '0.1rem 0.5rem', fontSize: '0.7rem', fontWeight: 900 }}>
+              مفاتيح
+            </span>
+          )}
+        </Link>
       </div>
     </div>
   );

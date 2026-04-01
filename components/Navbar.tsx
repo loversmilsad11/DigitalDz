@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { User, LogOut, LayoutDashboard, ShoppingCart } from 'lucide-react';
 import { useCart } from './CartContext';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -55,7 +56,7 @@ export default function Navbar() {
           href="/cart" 
           style={{ 
             position: 'relative', 
-            color: 'white', 
+            color: 'var(--foreground)', 
             textDecoration: 'none', 
             display: 'flex', 
             alignItems: 'center',
@@ -82,12 +83,14 @@ export default function Navbar() {
               justifyContent: 'center',
               fontSize: '0.65rem',
               fontWeight: 900,
-              border: '2px solid #0a0a0a'
+              border: '2px solid var(--background)'
             }}>
               {totalItems > 9 ? '9+' : totalItems}
             </span>
           )}
         </Link>
+
+        <ThemeToggle />
 
         {status === 'authenticated' ? (
           <div style={{ display: 'flex', gap: scrolled ? '0.8rem' : '1.2rem', alignItems: 'center', transition: 'gap 0.4s' }}>

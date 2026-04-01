@@ -1,17 +1,19 @@
 import { getCategories, getProducts, getDashboardStats } from '@/lib/admin-actions';
-import { Package, Tag, Users, ShoppingCart } from 'lucide-react';
+import { getEnhancedStats } from '@/lib/user-actions';
+import { Package, Tag, Users, ShoppingCart, TrendingUp, DollarSign, Award } from 'lucide-react';
 import AdminChart from '@/components/AdminChart';
 
 export default async function AdminDashboardOverview() {
   const categories = await getCategories();
   const products = await getProducts();
   const { totalOrders, totalUsers, recentOrders, chartData } = await getDashboardStats();
+  const { totalRevenue, topProducts, recentUsersCount } = await getEnhancedStats();
 
   const stats = [
-    { label: 'إجمالي المنتجات', value: products.length, icon: Package, color: 'text-fuchsia-400' },
-    { label: 'إجمالي الفئات', value: categories.length, icon: Tag, color: 'text-emerald-400' },
-    { label: 'إجمالي الطلبات', value: totalOrders, icon: ShoppingCart, color: 'text-amber-400' },
-    { label: 'إجمالي المستخدمين', value: totalUsers, icon: Users, color: 'text-blue-400' },
+    { label: 'إجمالي المنتجات', value: products.length, icon: Package, color: '#e879f9' },
+    { label: 'إجمالي الفئات', value: categories.length, icon: Tag, color: '#34d399' },
+    { label: 'إجمالي الطلبات', value: totalOrders, icon: ShoppingCart, color: '#fbbf24' },
+    { label: 'إجمالي الإيرادات', value: `${totalRevenue.toLocaleString()} د.ج`, icon: DollarSign, color: '#34d399' },
   ];
 
   return (
@@ -22,7 +24,7 @@ export default async function AdminDashboardOverview() {
         {stats.map((stat, i) => (
           <div key={i} className="glass-morphism" style={{ padding: '1.75rem', borderRadius: '2rem', display: 'flex', alignItems: 'center', gap: '1.25rem', border: '1px solid var(--glass-border)' }}>
             <div style={{ padding: '1.25rem', borderRadius: '1.25rem', backgroundColor: 'rgba(255,255,255,0.03)' }}>
-              <stat.icon size={28} style={{ color: stat.color === 'text-fuchsia-400' ? '#e879f9' : stat.color === 'text-emerald-400' ? '#34d399' : stat.color === 'text-amber-400' ? '#fbbf24' : '#60a5fa' }} />
+              <stat.icon size={28} style={{ color: stat.color }} />
             </div>
             <div>
               <p style={{ color: 'var(--foreground-muted)', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>{stat.label}</p>
@@ -32,13 +34,42 @@ export default async function AdminDashboardOverview() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr min(450px, 100%)', gap: '2rem', alignItems: 'start' }}>
-        {/* Sales Chart */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr min(450px, 100%)', gap: '2rem', alignItems: 'start', marginBottom: '3rem' }}>
+        {/* Top Selling Products */}
         <div className="glass-morphism" style={{ padding: '2rem', borderRadius: '2.5rem', border: '1px solid var(--glass-border)' }}>
-          <h2 className="title-font" style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', color: 'white' }}>مبيعات آخر 30 يوماً</h2>
-          <AdminChart data={chartData} />
+          <h2 className="title-font" style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Award size={24} style={{ color: '#fbbf24' }} /> أفضل المنتجات مبيعاً
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {topProducts.length === 0 ? (
+              <p style={{ color: 'var(--foreground-muted)' }}>لا توجد بيانات كافية.</p>
+            ) : (
+              topProducts.map((tp: any, i) => (
+                <div key={tp.productId} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: '0.75rem', overflow: 'hidden', flexShrink: 0, background: 'rgba(255,255,255,0.05)' }}>
+                     {tp.product?.image ? <img src={tp.product.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Package size={20} style={{ margin: '10px', opacity: 0.3 }} />}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tp.product?.nameAr || 'منتج محذوف'}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--foreground-muted)' }}>تم بيع {tp._sum.quantity} قطعة</div>
+                  </div>
+                  <div style={{ fontWeight: 900, color: 'var(--primary)', fontSize: '0.9rem' }}>#{i+1}</div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
+        {/* Chart */}
+        <div className="glass-morphism" style={{ padding: '2rem', borderRadius: '2.5rem', border: '1px solid var(--glass-border)' }}>
+          <h2 className="title-font" style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <TrendingUp size={24} style={{ color: '#60a5fa' }} /> مبيعات آخر 30 يوماً
+          </h2>
+          <AdminChart data={chartData} />
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '100%', gap: '2rem', alignItems: 'start' }}>
         {/* Recent Orders Table */}
         <div className="glass-morphism" style={{ padding: '2rem', borderRadius: '2.5rem', border: '1px solid var(--glass-border)' }}>
           <h2 className="title-font" style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', color: 'white' }}>أحدث الطلبات</h2>

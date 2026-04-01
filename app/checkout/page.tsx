@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { FadeIn } from '@/components/Animations';
-import { CheckCircle2, Lock, ShieldCheck, Zap, ExternalLink, AlertCircle, ShoppingCart } from 'lucide-react';
+import { CheckCircle2, Lock, ShieldCheck, Zap, ExternalLink, AlertCircle, ShoppingCart, Tag } from 'lucide-react';
+import { validateCoupon } from '@/lib/user-actions';
 
 const PAYMENT_METHODS = [
   { id: 'baridimob', label: 'Baridimob', labelAr: 'بريدي موب', icon: '📱', color: '#f59e0b', description: 'تحويل عبر بريدي موب' },
@@ -27,10 +28,39 @@ export default function CheckoutPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  // Coupon states
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+
   useEffect(() => {
     if (session?.user?.name) setName(session.user.name);
     if (session?.user?.email) setEmail(session.user.email);
   }, [session]);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const res = await validateCoupon(couponCode, totalPrice);
+      if (res.error) {
+        setCouponError(res.error);
+        setAppliedCoupon(null);
+        setDiscountAmount(0);
+      } else {
+        setAppliedCoupon(res.coupon);
+        setDiscountAmount(res.discountAmount || 0);
+        setCouponError('');
+      }
+    } catch (err) {
+      setCouponError('حدث خطأ أثناء التحقق من الكوبون');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
 
   const handleManualPayment = async () => {
     if (!transactionId) {
@@ -49,7 +79,8 @@ export default function CheckoutPage() {
           items: items.map(item => ({ productId: item.id, quantity: item.quantity, price: item.price })),
           paymentMethod: selectedPayment,
           paymentId: transactionId,
-          name, phone, email
+          name, phone, email,
+          couponCode: appliedCoupon?.code
         })
       });
 
@@ -156,9 +187,66 @@ export default function CheckoutPage() {
           <FadeIn delay={0.2}>
              <div className="glass-morphism" style={{ padding: '2rem', borderRadius: '2rem', border: '1px solid var(--glass-border)', position: 'sticky', top: '100px' }}>
                 <h2 className="title-font" style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '1.5rem' }}>ملخص الطلب</h2>
-                <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary)', marginBottom: '1.5rem' }}>
-                   {totalPrice.toLocaleString()} <span style={{ fontSize: '0.9rem' }}>د.ج</span>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--foreground-muted)' }}>
+                    <span>المجموع الفرعي</span>
+                    <span>{totalPrice.toLocaleString()} د.ج</span>
+                  </div>
+                  
+                  {appliedCoupon && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#22c55e', fontWeight: 600 }}>
+                      <span>خصم ({appliedCoupon.code})</span>
+                      <span>-{discountAmount.toLocaleString()} د.ج</span>
+                    </div>
+                  )}
+                  
+                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.75rem', marginTop: '0.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 800 }}>الإجمالي النهائي</span>
+                    <span style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary)' }}>
+                       {(totalPrice - discountAmount).toLocaleString()} <span style={{ fontSize: '0.9rem' }}>د.ج</span>
+                    </span>
+                  </div>
                 </div>
+
+                {/* Coupon Input */}
+                {!appliedCoupon ? (
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input 
+                        type="text" 
+                        value={couponCode} 
+                        onChange={e => setCouponCode(e.target.value.toUpperCase())} 
+                        placeholder="كود الخصم" 
+                        style={{ ...inputStyle, padding: '0.75rem 1rem', fontSize: '0.9rem' }} 
+                      />
+                      <button 
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading || !couponCode.trim()}
+                        style={{ 
+                          padding: '0.75rem 1.25rem', 
+                          borderRadius: '1rem', 
+                          background: 'rgba(255,255,255,0.05)', 
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          color: 'white',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        {couponLoading ? '...' : 'تطبيق'}
+                      </button>
+                    </div>
+                    {couponError && <p style={{ color: '#f43f5e', fontSize: '0.75rem', marginTop: '0.5rem', display: 'flex', gap: '0.25rem', alignItems: 'center' }}><AlertCircle size={12} /> {couponError}</p>}
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: '1.5rem', padding: '0.75rem', borderRadius: '1rem', background: 'rgba(34,197,94,0.1)', border: '1px dashed rgba(34,197,94,0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#22c55e', fontSize: '0.85rem', fontWeight: 700 }}>
+                      <Tag size={14} /> تم تطبيق الكوبون
+                    </div>
+                    <button onClick={() => { setAppliedCoupon(null); setDiscountAmount(0); setCouponCode(''); }} style={{ background: 'none', border: 'none', color: '#f43f5e', cursor: 'pointer', fontSize: '0.75rem' }}>إزالة</button>
+                  </div>
+                )}
                 
                 {error && <div style={{ color: '#f43f5e', fontSize: '0.85rem', marginBottom: '1rem', display: 'flex', gap: '0.5rem' }}><AlertCircle size={14} />{error}</div>}
                 
@@ -177,6 +265,7 @@ export default function CheckoutPage() {
                 </div>
              </div>
           </FadeIn>
+
         </div>
       </div>
     </div>

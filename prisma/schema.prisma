@@ -44,6 +44,7 @@ model User {
   accounts      Account[]
   orders        Order[]
   sessions      Session[]
+  reviews       Review[]
 }
 
 model VerificationToken {
@@ -74,6 +75,7 @@ model Product {
   categoryId    String
   keys          DigitalKey[]
   orderItems    OrderItem[]
+  reviews       Review[]
   category      Category     @relation(fields: [categoryId], references: [id])
 }
 
@@ -91,6 +93,8 @@ model Order {
   id            String       @id @default(cuid())
   userId        String
   total         Decimal      @db.Decimal(10, 2)
+  discount      Decimal?     @db.Decimal(10, 2)
+  couponCode    String?
   status        String       @default("PENDING")
   paymentMethod String?
   paymentId     String?
@@ -128,4 +132,30 @@ model Payment {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   order        Order    @relation(fields: [orderId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  orderId   String?
+  rating    Int      @default(5)
+  comment   String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  discount    Decimal  @db.Decimal(5, 2)
+  type        String   @default("PERCENT")
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  expiresAt   DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
 }

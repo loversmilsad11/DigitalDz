@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { items, paymentMethod, paymentId, name, phone, email } = body;
+    const { items, paymentMethod, paymentId, name, phone, email, couponCode } = body;
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'السلة فارغة' }, { status: 400 });
@@ -30,17 +30,59 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'المستخدم غير موجود' }, { status: 404 });
     }
 
-    // Calculate total and prepare order items
-    let total = 0;
+    // Calculate subtotal from DB to be safe
+    let subtotal = 0;
+    const dbProducts = await prisma.product.findMany({
+      where: { id: { in: items.map((i: any) => i.productId) } }
+    });
+
     for (const item of items) {
-      total += item.price * item.quantity;
+      const product = dbProducts.find(p => p.id === item.productId);
+      if (product) {
+        subtotal += Number(product.price) * item.quantity;
+      }
     }
+
+    // Handle Coupon
+    let discountAmount = 0;
+    let appliedCouponCode = null;
+
+    if (couponCode) {
+      const coupon = await prisma.coupon.findUnique({
+        where: { code: couponCode.toUpperCase(), isActive: true }
+      });
+
+      if (coupon) {
+        // Simple validation
+        const notExpired = !coupon.expiresAt || coupon.expiresAt > new Date();
+        const underLimit = !coupon.maxUses || coupon.usedCount < coupon.maxUses;
+
+        if (notExpired && underLimit) {
+          discountAmount = coupon.type === 'PERCENT'
+            ? (subtotal * Number(coupon.discount)) / 100
+            : Number(coupon.discount);
+          
+          discountAmount = Math.min(discountAmount, subtotal);
+          appliedCouponCode = coupon.code;
+
+          // Increment coupon usage
+          await prisma.coupon.update({
+            where: { id: coupon.id },
+            data: { usedCount: { increment: 1 } }
+          });
+        }
+      }
+    }
+
+    const finalTotal = subtotal - discountAmount;
 
     // Create the order
     const order = await prisma.order.create({
       data: {
         userId: user.id,
-        total,
+        total: finalTotal,
+        discount: discountAmount,
+        couponCode: appliedCouponCode,
         status: 'PENDING',
         paymentMethod,
         paymentId,
@@ -48,11 +90,14 @@ export async function POST(req: NextRequest) {
         customerPhone: phone,
         customerEmail: email,
         items: {
-          create: items.map((item: any) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price
-          }))
+          create: items.map((item: any) => {
+            const product = dbProducts.find(p => p.id === item.productId);
+            return {
+              productId: item.productId,
+              quantity: item.quantity,
+              price: product ? product.price : 0
+            };
+          })
         }
       }
     });

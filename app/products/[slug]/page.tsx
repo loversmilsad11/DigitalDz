@@ -2,7 +2,21 @@ import Navbar from '@/components/Navbar';
 import prisma from '@/lib/db';
 import ProductDetailClient from './ProductDetailClient';
 import ProductCard from '@/components/ProductCard';
+import ProductReviews from '@/components/ProductReviews';
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/Animations';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
+  const { slug } = await props.params;
+  const product = await prisma.product.findUnique({ where: { slug } });
+  if (!product) return { title: 'منتج – DigitalDZ' };
+  return {
+    title: `${product.nameAr} – DigitalDZ`,
+    description: product.descriptionAr,
+    openGraph: { title: product.nameAr, description: product.descriptionAr, images: product.image ? [product.image] : [] },
+  };
+}
 
 export default async function ProductDetailsPage(props: {
   params: Promise<{ slug: string }>;
@@ -12,6 +26,10 @@ export default async function ProductDetailsPage(props: {
 
   let product = null;
   let relatedProducts: any[] = [];
+  let reviews: any[] = [];
+  let hasBought = false;
+
+  const session = await getServerSession(authOptions);
 
   try {
     product = await prisma.product.findUnique({
@@ -20,16 +38,36 @@ export default async function ProductDetailsPage(props: {
     });
 
     if (product) {
-      relatedProducts = await prisma.product.findMany({
-        where: {
-          categoryId: product.categoryId,
-          NOT: { id: product.id },
-        },
-        take: 3,
-      });
+      [relatedProducts, reviews] = await Promise.all([
+        prisma.product.findMany({
+          where: {
+            categoryId: product.categoryId,
+            NOT: { id: product.id },
+          },
+          take: 3,
+        }),
+        prisma.review.findMany({
+          where: { productId: product.id },
+          include: { user: { select: { name: true, image: true } } },
+          orderBy: { createdAt: 'desc' },
+        })
+      ]);
+
+      if (session?.user) {
+        const orderCount = await prisma.orderItem.count({
+          where: {
+            productId: product.id,
+            order: {
+              userId: (session.user as any).id,
+              status: { in: ['COMPLETED', 'PAID'] }
+            }
+          }
+        });
+        hasBought = orderCount > 0;
+      }
     }
-  } catch {
-    // DB not available
+  } catch (error) {
+    console.error('Error fetching product details:', error);
   }
 
   if (!product) {
@@ -79,6 +117,16 @@ export default async function ProductDetailsPage(props: {
           }}
         />
 
+        <ProductReviews
+          productId={product.id}
+          initialReviews={reviews.map(r => ({
+             ...r,
+             createdAt: r.createdAt
+          }))}
+          isLoggedIn={!!session}
+          hasBought={hasBought}
+        />
+
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <section style={{ marginTop: '5rem', paddingTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
@@ -111,3 +159,4 @@ export default async function ProductDetailsPage(props: {
     </div>
   );
 }
+
