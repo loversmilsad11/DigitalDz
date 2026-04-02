@@ -1,6 +1,7 @@
 import { Inter, Outfit } from 'next/font/google';
 import Providers from '@/components/Providers';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import "./globals.css";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -32,6 +33,7 @@ export default function RootLayout({
           <div className="min-h-screen bg-surface text-foreground font-inter">
             {children}
             <WhatsAppButton />
+            <MobileBottomNav />
           </div>
         </Providers>
       </body>

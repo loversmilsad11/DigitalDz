@@ -34,7 +34,7 @@ export default async function AdminDashboardOverview() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr min(450px, 100%)', gap: '2rem', alignItems: 'start', marginBottom: '3rem' }}>
+      <div className="admin-grid" style={{ display: 'grid', gridTemplateColumns: '1fr min(450px, 100%)', gap: '2rem', alignItems: 'start', marginBottom: '3rem' }}>
         {/* Top Selling Products */}
         <div className="glass-morphism" style={{ padding: '2rem', borderRadius: '2.5rem', border: '1px solid var(--glass-border)' }}>
           <h2 className="title-font" style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

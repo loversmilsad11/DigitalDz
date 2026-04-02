@@ -83,13 +83,13 @@ export default function CartPage() {
           </div>
         </FadeIn>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr min(380px, 100%)', gap: '2rem', alignItems: 'start' }}>
+        <div className="cart-grid" style={{ display: 'grid', gridTemplateColumns: '1fr min(380px, 100%)', gap: '2rem', alignItems: 'start' }}>
           {/* Cart Items */}
           <StaggerContainer>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {items.map(item => (
                 <StaggerItem key={item.id}>
-                  <div className="glass-morphism" style={{
+                  <div className="glass-morphism cart-item" style={{
                     borderRadius: '1.5rem',
                     padding: '1.25rem',
                     display: 'flex',

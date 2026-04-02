@@ -17,8 +17,7 @@ export default async function IndexPage() {
 
       {/* Hero Section */}
       <ScaleIn>
-        <section className="container" style={{ 
-          padding: '8rem 2rem', 
+        <section className="container section-padding" style={{ 
           position: 'relative', 
           overflow: 'hidden', 
           borderRadius: '3rem',
@@ -123,7 +122,7 @@ export default async function IndexPage() {
       {/* Featured Products */}
       <section className="container" style={{ padding: '4rem 0' }}>
         <FadeIn>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3.5rem' }}>
+          <div className="flex-col-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3.5rem' }}>
             <div>
                <h2 className="title-font" style={{ fontSize: '2.5rem', fontWeight: 800 }}>المنتجات</h2>
                <p style={{ color: 'var(--foreground-muted)' }}>استكشف أحدث المنتجات الرقمية المتوفرة</p>
@@ -193,15 +192,15 @@ export default async function IndexPage() {
 
       {/* Footer */}
       <FadeIn>
-        <footer className="container" style={{ padding: '6rem 0', marginTop: '4rem', borderTop: '1px solid var(--glass-border)' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4rem', justifyContent: 'space-between' }}>
+        <footer className="container section-padding" style={{ marginTop: '4rem', borderTop: '1px solid var(--glass-border)' }}>
+          <div className="flex-col-mobile" style={{ display: 'flex', flexWrap: 'wrap', gap: '4rem', justifyContent: 'space-between' }}>
             <div style={{ maxWidth: 300 }}>
               <h2 className="title-font gradient-text" style={{ fontSize: '2rem', marginBottom: '1rem' }}>DigitalDZ</h2>
               <p style={{ color: 'var(--foreground-muted)', lineHeight: 1.6 }}>
                  المنصة الأولى لبيع المنتجات الرقمية في الجزائر بجودة عالمية وأسعار تنافسية.
               </p>
             </div>
-            <div style={{ display: 'flex', gap: '6rem' }}>
+            <div style={{ display: 'flex', gap: '4rem' }}>
               <div>
                  <h4 className="title-font" style={{ marginBottom: '1.5rem' }}>روابط سريعة</h4>
                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>

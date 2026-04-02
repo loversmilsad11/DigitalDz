@@ -41,19 +41,22 @@ export default function Navbar() {
       </Link>
       
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-        <Link href="/products" className="title-font" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
-          المنتجات
-        </Link>
-        <Link href="/about" className="title-font" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
-          من نحن
-        </Link>
-        <Link href="/contact" className="title-font" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
-          اتصل بنا
-        </Link>
+        <div className="nav-links-desktop" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <Link href="/products" className="title-font" style={{ color: 'var(--foreground)', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
+            المنتجات
+          </Link>
+          <Link href="/about" className="title-font" style={{ color: 'var(--foreground)', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
+            من نحن
+          </Link>
+          <Link href="/contact" className="title-font" style={{ color: 'var(--foreground)', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
+            اتصل بنا
+          </Link>
+        </div>
         
         {/* Cart Icon */}
         <Link 
           href="/cart" 
+          className="top-cart-icon"
           style={{ 
             position: 'relative', 
             color: 'var(--foreground)', 
@@ -94,19 +97,28 @@ export default function Navbar() {
 
         {status === 'authenticated' ? (
           <div style={{ display: 'flex', gap: scrolled ? '0.8rem' : '1.2rem', alignItems: 'center', transition: 'gap 0.4s' }}>
-             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'rgba(255,255,255,0.05)', padding: '0.4rem 1rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-               <User size={16} style={{ color: '#e879f9' }} />
-               <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600 }}>
-                 {session.user?.name?.split(' ')[0] || session.user?.email?.split('@')[0]}
-               </span>
-               {(session.user as any)?.role === 'ADMIN' && (
-                 <Link href="/admin" title="لوحة التحكم" style={{ display: 'flex', alignItems: 'center', color: '#e879f9', textDecoration: 'none' }}>
-                   <LayoutDashboard size={18} style={{ marginInlineStart: '0.5rem' }} />
-                 </Link>
+             <div className="top-nav-item" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'rgba(255,255,255,0.05)', padding: '0.4rem 1rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+               {session.user?.image ? (
+                 <img src={session.user.image} alt={session.user.name || ''} style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+               ) : (
+                 <User size={18} style={{ color: 'var(--primary)' }} />
                )}
+               <span style={{ color: 'white', fontWeight: 600, fontSize: '0.85rem' }}>{session.user?.name?.split(' ')[0]}</span>
              </div>
+             
+             {(session?.user as any)?.role === 'ADMIN' && (
+               <Link href="/admin" title="لوحة التحكم" style={{ display: 'flex', alignItems: 'center', color: 'var(--primary)', textDecoration: 'none' }}>
+                 <LayoutDashboard size={20} />
+               </Link>
+             )}
+
+             <Link href="/orders" className="top-nav-item" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', opacity: 0.8, transition: 'opacity 0.2s' }} onMouseOver={e => e.currentTarget.style.opacity = '1'} onMouseOut={e => e.currentTarget.style.opacity = '0.8'}>
+               طلباتي
+             </Link>
+
              <Link
                href="/profile"
+               className="top-nav-item"
                style={{ background: 'transparent', color: 'var(--foreground-muted)', display: 'flex', alignItems: 'center', padding: '0.5rem', textDecoration: 'none', transition: 'color 0.2s' }}
                title="ملفي الشخصي"
                onMouseOver={e => (e.currentTarget as HTMLElement).style.color = 'white'}
@@ -114,8 +126,10 @@ export default function Navbar() {
              >
                <User size={20} />
              </Link>
+             
              <button 
                onClick={() => signOut()}
+               className="top-nav-item"
                style={{ background: 'transparent', border: 'none', color: '#f43f5e', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0.5rem' }}
                title="خروج"
              >

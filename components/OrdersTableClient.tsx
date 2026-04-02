@@ -75,7 +75,7 @@ export default function OrdersTableClient({ initialOrders }: { initialOrders: an
   }
 
   return (
-    <div className="glass-morphism" style={{ padding: '1.5rem', borderRadius: '2rem', border: '1px solid var(--glass-border)', overflowX: 'auto' }}>
+    <div className="glass-morphism admin-table-container" style={{ padding: '1.5rem', borderRadius: '2rem', border: '1px solid var(--glass-border)', overflowX: 'auto' }}>
       
       {/* Bulk Actions Toolbar */}
       {selectedIds.size > 0 && (

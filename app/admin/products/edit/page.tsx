@@ -134,7 +134,7 @@ export default function AdminEditProductPage({ searchParams }: { searchParams: P
         </Link>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(350px, 1.25fr) minmax(350px, 1fr)', gap: '2rem', alignItems: 'start' }}>
+      <div className="admin-grid" style={{ display: 'grid', gridTemplateColumns: '1.25fr 1fr', gap: '2rem', alignItems: 'start' }}>
         
         {/* Form Section */}
         <div className="glass-morphism" style={{ padding: '2.5rem', borderRadius: '2rem', border: '1px solid var(--glass-border)' }}>
@@ -149,7 +149,7 @@ export default function AdminEditProductPage({ searchParams }: { searchParams: P
           )}
 
           <form action={handleProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--foreground-muted)', marginBottom: '0.5rem' }}>الاسم (بالعربية)</label>
                 <input name="nameAr" defaultValue={product.nameAr} required style={{ width: '100%', backgroundColor: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '1rem', padding: '1rem', color: 'white', outline: 'none', transition: 'border 0.2s' }} onFocus={e => e.target.style.borderColor = '#60a5fa'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.05)'} />
@@ -160,7 +160,7 @@ export default function AdminEditProductPage({ searchParams }: { searchParams: P
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--foreground-muted)', marginBottom: '0.5rem' }}>التصنيف</label>
                 <select name="categoryId" defaultValue={product.categoryId} required style={{ width: '100%', backgroundColor: '#111', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '1rem', padding: '1rem', color: 'white', outline: 'none' }}>
@@ -205,7 +205,7 @@ export default function AdminEditProductPage({ searchParams }: { searchParams: P
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* Status Boxes */}
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="flex-col-mobile" style={{ display: 'flex', gap: '1rem' }}>
              <div className="glass-morphism" style={{ flex: 1, padding: '1.5rem', borderRadius: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid rgba(52, 211, 153, 0.2)', backgroundColor: 'rgba(52, 211, 153, 0.05)' }}>
                 <div style={{ padding: '1rem', borderRadius: '1rem', backgroundColor: 'rgba(52, 211, 153, 0.1)' }}>
                   <ShieldCheck size={24} color="#34d399" />

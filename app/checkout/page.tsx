@@ -126,7 +126,7 @@ export default function CheckoutPage() {
           </div>
         </FadeIn>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr min(420px, 100%)', gap: '2rem', alignItems: 'start' }}>
+        <div className="checkout-grid" style={{ display: 'grid', gridTemplateColumns: '1fr min(420px, 100%)', gap: '2rem', alignItems: 'start' }}>
           {/* Form */}
           <FadeIn>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>

@@ -32,7 +32,7 @@ export default function ProductCard({ id, name, description, price, slug, curren
       style={{ textDecoration: 'none', display: 'block', height: '100%' }}
     >
       <div 
-        className="glass-morphism group" 
+        className="glass-morphism group shimmer-trigger float-hover" 
         style={{ 
           padding: '1rem', 
           borderRadius: '2rem',
